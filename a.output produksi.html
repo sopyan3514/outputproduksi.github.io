@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Produksi Tahunan - PT. Kemasan Fleksibel Indonesia</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/charts.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-industry"></i>
+                <div>
+                    <h1>PT. KFI Production</h1>
+                    <span>Analisis Produksi Flexible Packaging</span>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="#input" class="nav-link">
+                    <i class="fas fa-plus-circle"></i> Input Data
+                </a>
+                <a href="#analysis" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Analisis
+                </a>
+                <a href="#reports" class="nav-link">
+                    <i class="fas fa-file-export"></i> Laporan
+                </a>
+                <button class="btn btn-primary btn-small" id="btn-help">
+                    <i class="fas fa-question-circle"></i> Bantuan
+                </button>
+            </div>
+            <button class="nav-toggle" id="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h2 id="page-title">Dashboard Analisis Produksi</h2>
+                    <p>Divisi Printing - Satuan Meter</p>
+                </div>
+                <div class="header-controls">
+                    <div class="year-selector">
+                        <label for="year-select">Tahun:</label>
+                        <select id="year-select" class="form-control">
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                        </select>
+                    </div>
+                    <div class="date-info">
+                        <span id="current-date"></span>
+                        <span class="shift-info" id="shift-info"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alert-banner">
+            <i class="fas fa-info-circle"></i>
+            <span>Sistem analisis produksi siap digunakan. Total data: <strong id="data-count">0</strong> records</span>
+            <button class="alert-close" id="close-alert">&times;</button>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-content" id="page-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="page-section active">
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="summary-card card-total">
+                        <div class="card-icon">
+                            <i class="fas fa-ruler-combined"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Total Output</h3>
+                            <div class="card-value" id="total-output">0 m</div>
+                            <div class="card-trend trend-up" id="output-trend">
+                                <i class="fas fa-arrow-up"></i> <span>0%</span> vs tahun lalu
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-efficiency">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Efisiensi</h3>
+                            <div class="card-value" id="avg-efficiency">0%</div>
+                            <div class="card-trend trend-up" id="efficiency-trend">
+                                <i class="fas fa-arrow-up"></i> <span>0%</span> vs tahun lalu
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-machine">
+                        <div class="card-icon">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Top Machine</h3>
+                            <div class="card-value" id="top-machine">-</div>
+                            <div class="card-subtext" id="machine-output">Output: 0 m</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card card-reject">
+                        <div class="card-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Reject Rate</h3>
+                            <div class="card-value" id="reject-rate">0%</div>
+                            <div class="card-trend trend-down" id="reject-trend">
+                                <i class="fas fa-arrow-down"></i> <span>0%</span> vs tahun lalu
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card wide-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-bar"></i> Output Bulanan</h3>
+                            <select id="chart-type" class="form-control-sm">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="monthly-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-pie"></i> Distribusi Mesin</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="distribution-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-trend-up"></i> Trend Efisiensi</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="efficiency-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Data -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h3><i class="fas fa-history"></i> Data Terbaru</h3>
+                        <a href="#input" class="btn btn-primary btn-small">
+                            <i class="fas fa-plus"></i> Tambah Data
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Order</th>
+                                    <th>Tanggal</th>
+                                    <th>Produk</th>
+                                    <th>Target</th>
+                                    <th>Aktual</th>
+                                    <th>Efisiensi</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-data">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Data Section -->
+            <section id="input" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-plus-circle"></i> Input Data Produksi</h2>
+                    <p>Tambah atau edit data produksi harian</p>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h4>Form Data Produksi</h4>
+                            <span class="form-mode" id="form-mode">Mode: Tambah Baru</span>
+                        </div>
+                        
+                        <form id="production-form">
+                            <input type="hidden" id="edit-id" value="">
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="order-number">
+                                        <i class="fas fa-barcode"></i> No. SPK
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" id="order-number" class="form-control" 
+                                           placeholder="CON/2024/01/001" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="production-date">
+                                        <i class="fas fa-calendar"></i> Tanggal Produksi
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="date" id="production-date" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-name">
+                                    <i class="fas fa-box"></i> Nama Produk
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" id="product-name" class="form-control" 
+                                       placeholder="Pouch Stand-up 100ml" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="composition">
+                                    <i class="fas fa-layer-group"></i> Komposisi Material
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea id="composition" class="form-control" rows="2"
+                                          placeholder="PET 12μ / AL 7μ / PE 50μ" required></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer">
+                                        <i class="fas fa-user-tie"></i> Customer
+                                    </label>
+                                    <input type="text" id="customer" class="form-control" 
+                                           placeholder="Nama Perusahaan">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="machine">
+                                        <i class="fas fa-cogs"></i> Mesin
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select id="machine" class="form-control" required>
+                                        <option value="">Pilih Mesin</option>
+                                        <option value="Printing 1">Printing 1</option>
+                                        <option value="Printing 2">Printing 2</option>
+                                        <option value="Printing 3">Printing 3</option>
+                                        <option value="Printing 4">Printing 4</option>
+                                        <option value="Lamination 1">Lamination 1</option>
+                                        <option value="Lamination 2">Lamination 2</option>
+                                        <option value="Extrusion 1">Extrusion 1</option>
+                                        <option value="Extrusion 2">Extrusion 2</option>
+                                        <option value="Extrusion 3">Extrusion 3</option>
+                                        <option value="Extrusion 4">Extrusion 4</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="target-quantity">
+                                        <i class="fas fa-bullseye"></i> Target (meter)
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="target-quantity" class="form-control" 
+                                           placeholder="5000" min="1" step="0.1" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="actual-output">
+                                        <i class="fas fa-check-circle"></i> Aktual (meter)
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="number" id="actual-output" class="form-control" 
+                                           placeholder="4750" min="0" step="0.1" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="reject-quantity">
+                                        <i class="fas fa-times-circle"></i> Reject (meter)
+                                    </label>
+                                    <input type="number" id="reject-quantity" class="form-control" 
+                                           placeholder="150" min="0" step="0.1">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="operator">
+                                        <i class="fas fa-user"></i> Operator
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input type="text" id="operator" class="form-control" 
+                                           placeholder="Nama Operator" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="shift">
+                                        <i class="fas fa-clock"></i> Shift
+                                        <span class="required">*</span>
+                                    </label>
+                                    <select id="shift" class="form-control" required>
+                                        <option value="">Pilih Shift</option>
+                                        <option value="Pagi">Pagi (07.00 - 15.00)</option>
+                                        <option value="Sore">Sore (15.00 - 23.00)</option>
+                                        <option value="Malam">Malam (23.00 - 07.00)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="status">
+                                        <i class="fas fa-flag"></i> Status
+                                    </label>
+                                    <select id="status" class="form-control">
+                                        <option value="completed">Selesai</option>
+                                        <option value="progress">Dalam Proses</option>
+                                        <option value="delayed">Terlambat</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notes">
+                                    <i class="fas fa-sticky-note"></i> Catatan
+                                </label>
+                                <textarea id="notes" class="form-control" rows="3"
+                                          placeholder="Catatan produksi..."></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Simpan Data
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="btn-clear">
+                                    <i class="fas fa-eraser"></i> Reset Form
+                                </button>
+                                <button type="button" class="btn btn-warning" id="btn-cancel-edit" style="display: none;">
+                                    <i class="fas fa-times"></i> Batal Edit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="stats-sidebar">
+                        <div class="stats-card">
+                            <h4><i class="fas fa-chart-pie"></i> Statistik Hari Ini</h4>
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <span class="stat-label">Data Masuk</span>
+                                    <span class="stat-value" id="today-count">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Output</span>
+                                    <span class="stat-value" id="today-output">0 m</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Rata-rata Efisiensi</span>
+                                    <span class="stat-value" id="today-efficiency">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <h4><i class="fas fa-industry"></i> Mesin Aktif</h4>
+                            <div class="machine-list" id="active-machines">
+                                <!-- Daftar mesin aktif -->
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                            <div class="quick-actions">
+                                <button class="btn btn-primary btn-block" id="btn-import">
+                                    <i class="fas fa-upload"></i> Import Data
+                                </button>
+                                <button class="btn btn-info btn-block" id="btn-backup">
+                                    <i class="fas fa-database"></i> Backup Data
+                                </button>
+                                <button class="btn btn-warning btn-block" id="btn-sample">
+                                    <i class="fas fa-magic"></i> Generate Sample
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h4><i class="fas fa-table"></i> Semua Data Produksi</h4>
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <input type="text" id="search-data" class="form-control" 
+                                       placeholder="Cari data...">
+                                <button class="btn btn-primary" id="btn-search">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <select id="data-filter" class="form-control">
+                                <option value="all">Semua Data</option>
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month">Bulan Ini</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table" id="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Order</th>
+                                    <th>Tanggal</th>
+                                    <th>Produk</th>
+                                    <th>Target</th>
+                                    <th>Aktual</th>
+                                    <th>Efisiensi</th>
+                                    <th>Mesin</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="pagination" id="pagination">
+                            <!-- Pagination akan diisi oleh JavaScript -->
+                        </div>
+                        <div class="table-info">
+                            Menampilkan <span id="page-info">0</span> dari <span id="total-info">0</span> data
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Section -->
+            <section id="analysis" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Analisis Produksi</h2>
+                    <p>Analisis mendalam dan prediksi produksi</p>
+                </div>
+
+                <div class="analysis-controls">
+                    <div class="control-group">
+                        <label for="analysis-type">Tipe Analisis:</label>
+                        <select id="analysis-type" class="form-control">
+                            <option value="monthly">Bulanan</option>
+                            <option value="quarterly">Triwulan</option>
+                            <option value="yearly">Tahunan</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="metric-select">Metrik:</label>
+                        <select id="metric-select" class="form-control">
+                            <option value="output">Output Produksi</option>
+                            <option value="efficiency">Efisiensi</option>
+                            <option value="reject">Reject Rate</option>
+                            <option value="productivity">Produktivitas</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="btn-generate-analysis">
+                        <i class="fas fa-play"></i> Generate Analisis
+                    </button>
+                    <button class="btn btn-success" id="btn-export-analysis">
+                        <i class="fas fa-download"></i> Export Analisis
+                    </button>
+                </div>
+
+                <!-- Analysis Charts -->
+                <div class="charts-row">
+                    <div class="chart-card wide-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-bar"></i> Analisis Trend</h3>
+                            <div class="chart-actions">
+                                <button class="btn btn-sm btn-outline" id="btn-zoom-in">
+                                    <i class="fas fa-search-plus"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline" id="btn-zoom-out">
+                                    <i class="fas fa-search-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="analysis-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-pie"></i> Komposisi</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="composition-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                <div class="insights-container">
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>Insights</h4>
+                        </div>
+                        <div class="insight-content" id="insights-content">
+                            <!-- Insights akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>Trend Analysis</h4>
+                        </div>
+                        <div class="insight-content" id="trend-analysis">
+                            <!-- Trend analysis akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <i class="fas fa-bullseye"></i>
+                            <h4>Recommendations</h4>
+                        </div>
+                        <div class="insight-content" id="recommendations">
+                            <!-- Recommendations akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Machine Performance -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h4><i class="fas fa-industry"></i> Performa Mesin</h4>
+                        <select id="machine-sort" class="form-control">
+                            <option value="output">Sortir: Output Tertinggi</option>
+                            <option value="efficiency">Sortir: Efisiensi Tertinggi</option>
+                            <option value="availability">Sortir: Availability</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="machine-performance">
+                            <thead>
+                                <tr>
+                                    <th>Mesin</th>
+                                    <th>Total Output</th>
+                                    <th>% dari Total</th>
+                                    <th>Avg. Efisiensi</th>
+                                    <th>Downtime</th>
+                                    <th>Reject Rate</th>
+                                    <th>Ranking</th>
+                                </tr>
+                            </thead>
+                            <tbody id="machine-performance-body">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="page-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-export"></i> Laporan & Export</h2>
+                    <p>Generate dan export laporan produksi</p>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h3>Excel Report</h3>
+                        <p>Export data ke format Excel dengan analisis lengkap</p>
+                        <button class="btn btn-success btn-block" id="btn-excel-report">
+                            <i class="fas fa-download"></i> Generate Excel
+                        </button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>PDF Report</h3>
+                        <p>Buat laporan PDF dengan grafik dan analisis</p>
+                        <button class="btn btn-danger btn-block" id="btn-pdf-report">
+                            <i class="fas fa-download"></i> Generate PDF
+                        </button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>Dashboard Report</h3>
+                        <p>Laporan dashboard dengan visualisasi interaktif</p>
+                        <button class="btn btn-primary btn-block" id="btn-dashboard-report">
+                            <i class="fas fa-eye"></i> Preview Dashboard
+                        </button>
+                    </div>
+
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Backup Data</h3>
+                        <p>Backup seluruh data produksi ke file JSON</p>
+                        <button class="btn btn-warning btn-block" id="btn-backup-report">
+                            <i class="fas fa-save"></i> Backup Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Configuration -->
+                <div class="form-card">
+                    <div class="form-header">
+                        <h4><i class="fas fa-cog"></i> Konfigurasi Laporan</h4>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="report-period">Periode Laporan:</label>
+                            <select id="report-period" class="form-control">
+                                <option value="daily">Harian</option>
+                                <option value="weekly">Mingguan</option>
+                                <option value="monthly">Bulanan</option>
+                                <option value="yearly" selected>Tahunan</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="report-start">Tanggal Mulai:</label>
+                            <input type="date" id="report-start" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="report-end">Tanggal Akhir:</label>
+                            <input type="date" id="report-end" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Include Data:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="include-summary" checked>
+                                <span>Summary Data</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="include-charts" checked>
+                                <span>Charts & Graphs</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="include-details" checked>
+                                <span>Detail Data</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="include-analysis" checked>
+                                <span>Analysis & Insights</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="btn-generate-custom">
+                            <i class="fas fa-play"></i> Generate Custom Report
+                        </button>
+                        <button class="btn btn-secondary" id="btn-reset-config">
+                            <i class="fas fa-redo"></i> Reset Configuration
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report History -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h4><i class="fas fa-history"></i> History Laporan</h4>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama File</th>
+                                    <th>Jenis</th>
+                                    <th>Periode</th>
+                                    <th>Tanggal Generate</th>
+                                    <th>Ukuran</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-history">
+                                <!-- History akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-industry"></i> PT. Kemasan Fleksibel Indonesia</h4>
+                <p>Sistem Analisis Produksi Flexible Packaging</p>
+                <p>Versi 4.0 | © 2024 All Rights Reserved</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Kontak</h4>
+                <p><i class="fas fa-phone"></i> (021) 1234-5678</p>
+                <p><i class="fas fa-envelope"></i> production@kfi.co.id</p>
+                <p><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#input">Input Data</a>
+                <a href="#analysis">Analisis</a>
+                <a href="#reports">Laporan</a>
+            </div>
+            
+            <div class="footer-section">
+                <h4>System Info</h4>
+                <p>Total Data: <span id="footer-data-count">0</span></p>
+                <p>Last Update: <span id="footer-last-update">-</span></p>
+                <p>Storage: <span id="storage-info">Local Storage</span></p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>Production Analysis System | Developed for PT. Kemasan Fleksibel Indonesia</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-question-circle"></i> Bantuan Sistem</h3>
+                <button class="modal-close" id="close-help">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h4>📊 Dashboard</h4>
+                    <p>Monitor ringkasan produksi harian dan analisis trend</p>
+                </div>
+                <div class="help-section">
+                    <h4>➕ Input Data</h4>
+                    <p>Tambah, edit, atau hapus data produksi. Validasi otomatis untuk konsistensi data.</p>
+                </div>
+                <div class="help-section">
+                    <h4>📈 Analisis</h4>
+                    <p>Analisis mendalam dengan berbagai metrik dan visualisasi.</p>
+                </div>
+                <div class="help-section">
+                    <h4>📄 Laporan</h4>
+                    <p>Generate dan export laporan dalam berbagai format.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Import Data</h3>
+                <button class="modal-close" id="close-import">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="upload-area">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop file Excel atau CSV di sini</p>
+                    <p>atau</p>
+                    <button class="btn btn-primary" id="btn-browse">Browse Files</button>
+                    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+                </div>
+                <div class="import-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="overwrite-data">
+                        <span>Overwrite existing data</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="validate-data" checked>
+                        <span>Validate data before import</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-import">Cancel</button>
+                <button class="btn btn-primary" id="confirm-import" disabled>Import Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container">
+        <!-- Toast notifications will be inserted here -->
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="scripts/data-manager.js"></script>
+    <script src="scripts/chart-manager.js"></script>
+    <script src="scripts/export-manager.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
